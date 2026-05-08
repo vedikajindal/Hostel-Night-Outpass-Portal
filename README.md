@@ -1,5 +1,33 @@
 # 🏫 Hostel Outpass Approval Portal
 
+> A secure, role-based web application that digitizes the hostel outpass approval process for educational institutions.
+
+---
+
+## Features
+
+- 🔐 **Role-Based Access Control** — Separate dashboards for Students, Parents, and Wardens
+- 📋 **Digital Outpass Requests** — Structured forms with destination, reason, and travel dates
+- 👨‍👩‍👧 **Parent Verification** — Parents can verify or submit requests on behalf of their child
+- ✅ **Warden Approval Interface** — Filterable table with one-click approve/reject actions
+- 📊 **Live Dashboard Statistics** — Real-time counts of total, pending, approved, and rejected requests
+- 🗂️ **Audit Logs** — Complete, immutable record of all user actions (login, submit, approve, reject)
+- 🌙 **Responsive Dark-Mode UI** — Works on both desktop and mobile browsers
+
+---
+
+## Tech Stack
+
+| Layer      | Technology                          |
+|------------|-------------------------------------|
+| Backend    | Node.js, Express.js                 |
+| Frontend   | HTML, CSS, JavaScript               |
+| Database   | SQLite                              |
+| Auth       | JWT (HttpOnly cookies), bcrypt      |
+| Security   | Helmet.js, Rate Limiting, Parameterized SQL |
+
+---
+
 ## 📁 Project Structure
 
 ```
