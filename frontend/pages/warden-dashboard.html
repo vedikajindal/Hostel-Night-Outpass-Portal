@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warden Dashboard — Outpass Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <style>
+        .legend { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:16px; }
+        .legend-item { display:flex; align-items:center; gap:8px; font-size:.83rem; color:var(--muted); }
+        .legend-dot { width:12px;height:12px;border-radius:50%; flex-shrink:0; }
+        .dot-green  { background:var(--student); }
+        .dot-yellow { background:var(--warn); }
+        .dot-red    { background:var(--danger); }
+        .action-btns { display:flex; gap:8px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand">🏫 <span>OutPass</span> Portal</div>
+    <div class="nav-right">
+        <div class="nav-user">Logged in as <strong id="nav-username">...</strong></div>
+        <span class="role-badge warden">Warden</span>
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+</nav>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-section">Navigation</div>
+        <a onclick="showSection('dashboard')" class="active" id="nav-dashboard">📊 Dashboard</a>
+        <a onclick="showSection('requests')"  id="nav-requests">📋 All Requests</a>
+        <div class="sidebar-section">Account</div>
+        <a onclick="showSection('profile')"   id="nav-profile">👤 Profile</a>
+    </aside>
+
+    <main class="main">
+
+        <section id="section-dashboard">
+            <h1 class="page-title">Warden Dashboard</h1>
+            <p class="page-sub">Manage all outpass requests for Tagore Hostel</p>
+
+            <div class="stats-row">
+                <div class="stat-card blue">
+                    <div class="stat-value" id="stat-total">—</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-value" id="stat-pending">—</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-value" id="stat-approved">—</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value" id="stat-rejected">—</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-value" id="stat-pverified">—</div>
+                    <div class="stat-label">Parent Verified</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-value" id="stat-today">—</div>
+                    <div class="stat-label">Today's Requests</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">⚡ Pending — Quick Action</span>
+                    <button class="btn btn-ghost btn-sm" onclick="showSection('requests')">View All</button>
+                </div>
+                <div class="legend">
+                    <div class="legend-item"><div class="legend-dot dot-green"></div>Parent Verified</div>
+                    <div class="legend-item"><div class="legend-dot dot-yellow"></div>Student Only</div>
+                    <div class="legend-item"><div class="legend-dot dot-red"></div>Rejected</div>
+                </div>
+                <div id="pending-quick-wrap" style="overflow-x:auto">
+                    <p class="empty-state"><span class="empty-icon">✅</span><br>No pending requests</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-requests" class="hidden">
+            <h1 class="page-title">All Outpass Requests</h1>
+            <p class="page-sub">Complete list with filtering and one-click approve/reject</p>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center">
+                <select id="f-status" onchange="loadRequests()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.85rem;">
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <select id="f-verified" onchange="loadRequests()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.85rem;">
+                    <option value="">All Verification</option>
+                    <option value="1">Parent Verified</option>
+                    <option value="0">Not Verified</option>
+                </select>
+                <input type="date" id="f-date" onchange="loadRequests()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:.85rem;" />
+                <button class="btn btn-ghost btn-sm" onclick="clearFilters()">Clear Filters</button>
+            </div>
+
+            <div class="legend" style="margin-bottom:16px">
+                <div class="legend-item"><div class="legend-dot dot-green"></div>Green = Parent Verified (fast-track)</div>
+                <div class="legend-item"><div class="legend-dot dot-yellow"></div>Yellow = Student Only</div>
+                <div class="legend-item"><div class="legend-dot dot-red"></div>Red = Rejected</div>
+            </div>
+
+            <div id="all-requests-wrap" style="overflow-x:auto">
+                <p class="empty-state"><span class="empty-icon">📭</span><br>Loading...</p>
+            </div>
+        </section>
+
+        <section id="section-profile" class="hidden">
+            <h1 class="page-title">Warden Profile</h1>
+            <p class="page-sub">Your account details</p>
+            <div class="card">
+                <div class="card-body" id="warden-profile-body">
+                    <p style="color:var(--muted)">Loading...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+<div class="modal-overlay" id="reject-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Reject Request #<span id="reject-id"></span></span>
+            <button class="modal-close" onclick="closeModal('reject-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Rejection Reason * (required)</label>
+                <textarea id="reject-reason" placeholder="Provide a clear reason for rejection..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('reject-modal')">Cancel</button>
+            <button class="btn btn-danger" onclick="submitReject()">❌ Confirm Rejection</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="approve-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Approve Request #<span id="approve-id"></span></span>
+            <button class="modal-close" onclick="closeModal('approve-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--muted);margin-bottom:16px">Confirm approval. The student may leave hostel as per the stated dates.</p>
+            <div class="form-group">
+                <label>Note (optional)</label>
+                <input type="text" id="approve-note" placeholder="Any instructions for the student..." />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('approve-modal')">Cancel</button>
+            <button class="btn btn-success" onclick="submitApprove()">✅ Confirm Approval</button>
+        </div>
+    </div>
+</div>
+
+<script src="../js/warden.js"></script>
+</body>
+</html>

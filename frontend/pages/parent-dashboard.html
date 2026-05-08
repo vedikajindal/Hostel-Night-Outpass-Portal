@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Dashboard — Outpass Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="nav-brand">🏫 <span>OutPass</span> Portal</div>
+    <div class="nav-right">
+        <div class="nav-user">Logged in as <strong id="nav-username">...</strong></div>
+        <span class="role-badge parent">Parent</span>
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
+    </div>
+</nav>
+
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="sidebar-section">Navigation</div>
+        <a onclick="showSection('dashboard')" class="active" id="nav-dashboard">📊 Dashboard</a>
+        <a onclick="showSection('submit')"    id="nav-submit">➕ Submit Request</a>
+        <a onclick="showSection('requests')"  id="nav-requests">📋 All Requests</a>
+        <div class="sidebar-section">Account</div>
+        <a onclick="showSection('child')"     id="nav-child">🎓 Child Info</a>
+    </aside>
+
+    <main class="main">
+        <section id="section-dashboard">
+            <h1 class="page-title">Parent Dashboard</h1>
+            <p class="page-sub">Monitor and manage outpass requests for your child</p>
+
+            <div class="stats-row">
+                <div class="stat-card blue">
+                    <div class="stat-value" id="stat-total">—</div>
+                    <div class="stat-label">Total Requests</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-value" id="stat-pending">—</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-value" id="stat-approved">—</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-value" id="stat-verified">—</div>
+                    <div class="stat-label">Verified by You</div>
+                </div>
+            </div>
+            <div class="card" id="child-summary-card">
+                <div class="card-header">
+                    <span class="card-title">My Child</span>
+                    <button class="btn btn-ghost btn-sm" onclick="showSection('child')">View Details</button>
+                </div>
+                <div class="card-body" id="child-summary-body">
+                    <p style="color:var(--muted)">Loading...</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Pending Requests (Awaiting Your Review)</span>
+                </div>
+                <div id="pending-wrap" style="overflow-x:auto">
+                    <p class="empty-state"><span class="empty-icon">✅</span><br>No pending requests</p>
+                </div>
+            </div>
+        </section>
+        <section id="section-submit" class="hidden">
+            <h1 class="page-title">Submit Outpass Request</h1>
+            <p class="page-sub">As a parent, your submission is automatically marked as <strong style="color:var(--student)">Parent Verified</strong>, making warden approval easier.</p>
+
+            <div id="submit-alert" class="hidden"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">New Outpass Request</span>
+                    <span class="badge badge-verified">✅ Auto-Verified</span>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Reason for Outpass *</label>
+                        <textarea id="p-reason" placeholder="Medical appointment, family function, emergency, etc."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Destination *</label>
+                        <input type="text" id="p-destination" placeholder="City or specific location" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Outgoing Date &amp; Time *</label>
+                            <input type="datetime-local" id="p-outgoing" />
+                        </div>
+                        <div class="form-group">
+                            <label>Return Date &amp; Time *</label>
+                            <input type="datetime-local" id="p-return" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Parent Note (optional)</label>
+                        <input type="text" id="p-note" placeholder="Add any additional context for the warden" />
+                    </div>
+                    <button class="btn btn-primary" onclick="submitParentRequest()">🚀 Submit Verified Request</button>
+                </div>
+            </div>
+        </section>
+        <section id="section-requests" class="hidden">
+            <h1 class="page-title">All Requests</h1>
+            <p class="page-sub">All outpass requests made for your child</p>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Request History</span>
+                    <select id="p-filter" onchange="loadAllRequests()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:8px;font-size:.83rem;">
+                        <option value="">All</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div id="all-requests-wrap" style="overflow-x:auto">
+                    <p class="empty-state"><span class="empty-icon">📭</span><br>Loading...</p>
+                </div>
+            </div>
+        </section>
+        <section id="section-child" class="hidden">
+            <h1 class="page-title">Child Information</h1>
+            <p class="page-sub">Details of your registered child</p>
+            <div class="card">
+                <div class="card-body" id="child-full-body">
+                    <p style="color:var(--muted)">Loading...</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+<div class="modal-overlay" id="verify-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Verify Request #<span id="verify-id"></span></span>
+            <button class="modal-close" onclick="closeModal('verify-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:var(--muted);margin-bottom:16px">By verifying, you confirm this outpass request. The warden will be notified of your approval.</p>
+            <div class="form-group">
+                <label>Note to Warden (optional)</label>
+                <input type="text" id="verify-note" placeholder="e.g. Medical emergency, I will accompany" />
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('verify-modal')">Cancel</button>
+            <button class="btn btn-success" onclick="submitVerify()">✅ Confirm Verification</button>
+        </div>
+    </div>
+</div>
+
+<script src="../js/parent.js"></script>
+</body>
+</html>
